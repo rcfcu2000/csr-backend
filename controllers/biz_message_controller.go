@@ -1,12 +1,13 @@
 package controllers
 
 import (
+	"csr-backend/models"
+	"fmt"
 	"net/http"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
-	"your_project/models"
 )
 
 type BizMessageController struct {
@@ -17,61 +18,68 @@ func NewBizMessageController(db *gorm.DB) *BizMessageController {
 	return &BizMessageController{DB: db}
 }
 
-func (ctrl *BizMessageController) CreateBizMessage(c *gin.Context) {
-	var newMessage models.BizMessage
-	if err := c.ShouldBindJSON(&newMessage); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	ctrl.DB.Create(&newMessage)
-	c.JSON(http.StatusOK, newMessage)
+type BizMessage struct {
+	MTime      string `json:"m_time" binding:"required"`
+	Direction  int64  `json:"direction" binding:"required"`
+	UserNick   string `json:"user_nick" binding:"required"`
+	CsrNick    string `json:"csr_nick" binding:"required"`
+	Content    string `json:"content"`
+	UrlLink    string `json:"url_link"`
+	TemplateID int64  `json:"template_id"`
 }
 
-func (ctrl *BizMessageController) GetBizMessage(c *gin.Context) {
-	mTime, err := time.Parse(time.RFC3339, c.Param("m_time"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid time format"})
-		return
-	}
-	direction := c.Param("direction")
-	var message models.BizMessage
-	if err := ctrl.DB.First(&message, "m_time = ? AND direction = ?", mTime, direction).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Record not found"})
-		return
-	}
-	c.JSON(http.StatusOK, message)
+type CreateBizMessagesRequest struct {
+	Messages []BizMessage `json:"messages" binding:"required"`
 }
 
-func (ctrl *BizMessageController) UpdateBizMessage(c *gin.Context) {
-	mTime, err := time.Parse(time.RFC3339, c.Param("m_time"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid time format"})
+// CreateBizMessages godoc
+// @Summary Create multiple new BizMessages
+// @Description Create multiple new BizMessage entries
+// @Tags biz_message
+// @Accept json
+// @Produce json
+// @Param data body CreateBizMessagesRequest true "BizMessages"
+// @Success 200 {array} models.BizMessage
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /api/v1/biz_messages [post]
+func (ctrl *BizMessageController) CreateBizMessages(c *gin.Context) {
+	var req CreateBizMessagesRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		fmt.Println(err.Error())
+		c.JSON(http.StatusBadRequest, models.ErrorResponse{Error: err.Error()})
 		return
 	}
-	direction := c.Param("direction")
-	var message models.BizMessage
-	if err := ctrl.DB.First(&message, "m_time = ? AND direction = ?", mTime, direction).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Record not found"})
-		return
-	}
-	if err := c.ShouldBindJSON(&message); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-	ctrl.DB.Save(&message)
-	c.JSON(http.StatusOK, message)
-}
 
-func (ctrl *BizMessageController) DeleteBizMessage(c *gin.Context) {
-	mTime, err := time.Parse(time.RFC3339, c.Param("m_time"))
-	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid time format"})
+	var bizMessages []models.BizMessage
+
+	for _, message := range req.Messages {
+		// Parse the date-time string into a time.Time object
+		layout := "2006-01-02 15:04:05"
+		mTime, err := time.Parse(layout, message.MTime)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, models.ErrorResponse{Error: "Invalid date format"})
+			return
+		}
+
+		bizMessage := models.BizMessage{
+			MTime:      mTime,
+			Direction:  message.Direction,
+			UserNick:   message.UserNick,
+			CsrNick:    message.CsrNick,
+			Content:    message.Content,
+			UrlLink:    message.UrlLink,
+			TemplateID: message.TemplateID,
+		}
+
+		bizMessages = append(bizMessages, bizMessage)
+	}
+
+	if err := ctrl.DB.Save(&bizMessages).Error; err != nil {
+		fmt.Println("Failed to save records")
+		c.JSON(http.StatusInternalServerError, models.ErrorResponse{Error: "Failed to save records"})
 		return
 	}
-	direction := c.Param("direction")
-	if err := ctrl.DB.Delete(&models.BizMessage{}, "m_time = ? AND direction = ?", mTime, direction).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Record not found"})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"message": "Record deleted"})
+
+	c.JSON(http.StatusOK, bizMessages)
 }

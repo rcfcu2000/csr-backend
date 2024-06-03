@@ -1,0 +1,218 @@
+definitions:
+  controllers.BizMessage:
+    properties:
+      content:
+        type: string
+      csr_nick:
+        type: string
+      direction:
+        type: integer
+      m_time:
+        type: string
+      template_id:
+        type: integer
+      url_link:
+        type: string
+      user_nick:
+        type: string
+    required:
+    - csr_nick
+    - direction
+    - m_time
+    - user_nick
+    type: object
+  controllers.CreateBizMessagesRequest:
+    properties:
+      messages:
+        items:
+          $ref: '#/definitions/controllers.BizMessage'
+        type: array
+    required:
+    - messages
+    type: object
+  controllers.CreateBizQaRequest:
+    properties:
+      biz_qa:
+        $ref: '#/definitions/models.BizQa'
+      biz_qa_questions:
+        items:
+          $ref: '#/definitions/models.BizQaQuestion'
+        type: array
+      biz_question_types:
+        items:
+          $ref: '#/definitions/models.BizQuestionType'
+        type: array
+    type: object
+  models.BizMessage:
+    properties:
+      content:
+        type: string
+      csr_nick:
+        type: string
+      direction:
+        type: integer
+      m_time:
+        type: string
+      template_id:
+        type: integer
+      url_link:
+        type: string
+      user_nick:
+        type: string
+    type: object
+  models.BizQa:
+    properties:
+      answer:
+        type: string
+      id:
+        type: integer
+      question:
+        type: string
+      updateTime:
+        type: string
+      updatedBy:
+        type: string
+    type: object
+  models.BizQaQuestion:
+    properties:
+      qid:
+        type: integer
+      question:
+        type: string
+      updateTime:
+        type: string
+      updatedBy:
+        type: string
+    type: object
+  models.BizQaType:
+    properties:
+      id:
+        type: integer
+      qtype:
+        type: string
+    type: object
+  models.BizQuestionType:
+    properties:
+      qid:
+        type: integer
+      typeID:
+        type: integer
+      updateTime:
+        type: string
+      updatedBy:
+        type: string
+    type: object
+  models.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/v1/biz_messages:
+    post:
+      consumes:
+      - application/json
+      description: Create multiple new BizMessage entries
+      parameters:
+      - description: BizMessages
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.CreateBizMessagesRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.BizMessage'
+            type: array
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Create multiple new BizMessages
+      tags:
+      - biz_message
+  /api/v1/biz_qa_complex:
+    post:
+      consumes:
+      - application/json
+      description: Create a BizQa along with BizQaQuestions and BizQuestionTypes in
+        one transaction
+      parameters:
+      - description: BizQa Complex Request
+        in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.CreateBizQaRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.BizQa'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Create a BizQa with related entities
+      tags:
+      - biz_qa
+  /api/v1/biz_qa_type/{id}:
+    get:
+      description: Get a BizQaType entry by ID
+      parameters:
+      - description: BizQaType ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.BizQaType'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get a BizQaType by ID
+      tags:
+      - biz_qa_type
+  /api/v1/biz_qa_types:
+    get:
+      description: Get all BizQaType entries
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.BizQaType'
+            type: array
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/models.ErrorResponse'
+      summary: Get all BizQaTypes
+      tags:
+      - biz_qa_type
+swagger: "2.0"
