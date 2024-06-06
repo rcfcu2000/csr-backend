@@ -25,6 +25,13 @@ type Login struct {
 	CaptchaId string `json:"captchaId"` // 验证码ID
 }
 
+// User login structure
+type SSOLogin struct {
+	Username string `json:"username"`    // 用户名
+	Password string `json:"password"`    // 密码
+	SsoUser  string `json:"ssoUsername"` // SSO用户
+}
+
 // Modify password structure
 type ChangePasswordReq struct {
 	ID          uint   `json:"-"`           // 从 JWT 中提取 user id，避免越权

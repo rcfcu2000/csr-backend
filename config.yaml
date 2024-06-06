@@ -5,7 +5,7 @@ jwt:
   signing-key: 03b4ed22-e5c1-4e7b-9974-8650622c72ab
   expires-time: 7d
   buffer-time: 1d
-  issuer: qmPlus1
+  issuer: zhihuige
 
 
 # zap logger configuration
