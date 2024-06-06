@@ -463,3 +463,62 @@ func (b *BaseApi) ResetPassword(c *gin.Context) {
 	}
 	response.OkWithMessage("重置成功", c)
 }
+
+// User SSO
+// @Tags      SysUser
+// @Summary   SSO_登录注册
+// @Security  ApiKeyAuth
+// @accept    application/json
+// @Produce  application/json
+// @Param     data  body      systemReq.SSOLogin    true  "用户名, 密码, SSo_User"
+// @Success   200   {object}  response.Response{msg=string}  "SSO_登录注册"
+// @Router    /user/ssoLogin [post]
+func (b *BaseApi) UserSso(c *gin.Context) {
+	var l systemReq.SSOLogin
+	err := c.ShouldBindJSON(&l)
+	key := c.ClientIP()
+
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	err = utils.Verify(l, utils.LoginVerify)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+
+	u := &system.SysUser{Username: l.Username, Password: l.Password}
+	user, err := userService.Login(u)
+	if err != nil {
+		global.GVA_LOG.Error("登陆失败! 用户名不存在或者密码错误!", zap.Error(err))
+		// 验证码次数+1
+		global.BlackCache.Increment(key, 1)
+		response.FailWithMessage("用户名不存在或者密码错误", c)
+		return
+	}
+	if user.Enable != 1 {
+		global.GVA_LOG.Error("登陆失败! 用户被禁止登录!")
+		// 验证码次数+1
+		global.BlackCache.Increment(key, 1)
+		response.FailWithMessage("用户被禁止登录", c)
+		return
+	}
+
+	U := &system.SysUser{Username: l.SsoUser, Password: l.SsoUser}
+	sso_user, err := userService.Login(U)
+
+	if err != nil {
+		sso_user = &system.SysUser{Username: l.SsoUser, Password: l.SsoUser, NickName: l.SsoUser}
+		userReturn, err := userService.Register(*sso_user)
+		if err != nil {
+			global.GVA_LOG.Error("注册失败!", zap.Error(err))
+			response.FailWithDetailed(systemRes.SysUserResponse{User: userReturn}, "注册失败", c)
+			return
+		}
+		// now login again
+		sso_user, _ = userService.Login(sso_user)
+	}
+
+	b.TokenNext(c, *sso_user)
+}
