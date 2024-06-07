@@ -2,6 +2,7 @@ package initialize
 
 import (
 	"context"
+	bizModel "xtt/model/biz"
 	"xtt/model/example"
 	sysModel "xtt/model/system"
 	"xtt/service/system"
@@ -56,6 +57,10 @@ func (e *ensureTables) MigrateTable(ctx context.Context) (context.Context, error
 		example.ExaCustomer{},
 		example.ExaFileChunk{},
 		example.ExaFileUploadAndDownload{},
+
+		bizModel.BizMerchant{},
+		bizModel.BizLinks{},
+		bizModel.BizMerchantLinks{},
 	}
 	for _, t := range tables {
 		_ = db.AutoMigrate(&t)
@@ -91,6 +96,10 @@ func (e *ensureTables) TableCreated(ctx context.Context) bool {
 		example.ExaCustomer{},
 		example.ExaFileChunk{},
 		example.ExaFileUploadAndDownload{},
+
+		bizModel.BizMerchant{},
+		bizModel.BizLinks{},
+		bizModel.BizMerchantLinks{},
 	}
 	yes := true
 	for _, t := range tables {

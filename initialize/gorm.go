@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"xtt/global"
+	bizModel "xtt/model/biz"
 	"xtt/model/example"
 	"xtt/model/system"
 
@@ -54,14 +55,9 @@ func RegisterTables() {
 		example.ExaFileChunk{},
 		example.ExaFileUploadAndDownload{},
 
-		// biz.ShopInfo{},
-		// biz.ShopWeight{},
-		// biz.ShopTrafficStats{},
-		// biz.ProductInfo{},
-		// biz.ProductTrafficStats{},
-		// biz.ProductPerformance{},
-		// biz.MarketCategoryIndexStats{},
-		// biz.UserPriceRange{},
+		bizModel.BizMerchant{},
+		bizModel.BizLinks{},
+		bizModel.BizMerchantLinks{},
 	)
 	if err != nil {
 		global.GVA_LOG.Error("register table failed", zap.Error(err))
