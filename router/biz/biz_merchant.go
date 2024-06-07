@@ -17,6 +17,7 @@ func (e *MerchantRouter) InitRouter(privateRouter *gin.RouterGroup, publicRouter
 	{
 		priRouter.POST("create", merchantController.CreateMerchant)
 		priRouter.GET("get/:id", merchantController.GetMerchant)
+		priRouter.GET("getByTid/:id", merchantController.GetMerchantsByTid)
 		priRouter.PUT("update/:id", merchantController.UpdateMerchant)
 		priRouter.DELETE("delete/:id", merchantController.DeleteMerchant)
 		priRouter.POST("upload", merchantController.UploadExcel) // New route for Excel upload

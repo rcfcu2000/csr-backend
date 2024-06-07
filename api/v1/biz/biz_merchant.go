@@ -66,6 +66,26 @@ func (ctrl *BizMerchantController) GetMerchant(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": merchant})
 }
 
+// GetMerchantsByTid handles fetching merchants by Taobao id
+// @Summary Get merchants by Taobao ID
+// @Description Get merchants by Taobao ID
+// @Tags Merchants
+// @Produce  json
+// @Param id path string true "Taobao ID"
+// @Success 200 {object} models.BizMerchant
+// @Failure 404 {object} models.ErrorResponse
+// @Router /merchant/getByTid/{id} [get]
+func (ctrl *BizMerchantController) GetMerchantsByTid(c *gin.Context) {
+	id := c.Param("id")
+	merchants, err := merchantService.GetMerchantsByTid(id)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": merchants})
+}
+
 // GetMerchantList
 // @Tags	  Merchants
 // @Summary   分页获取商品列表

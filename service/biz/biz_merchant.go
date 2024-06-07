@@ -43,6 +43,20 @@ func (exa *MerchantService) GetMerchant(id string) (*models.BizMerchant, error) 
 	return &merchant, nil
 }
 
+// GetMerchant retrieves merchants by taobaoid from the database
+func (exa *MerchantService) GetMerchantsByTid(id string) ([]*models.BizMerchant, error) {
+	var merchants []*models.BizMerchant
+
+	sql_string := "select * from biz_merchants where merchant_id in (select biz_merchant_merchant_id from biz_merchant_links where biz_links_link_id in (select link_id from biz_links where taobao_id = ?))"
+	err := global.GVA_DB.Raw(sql_string, id).Scan(&merchants).Error
+
+	if err != nil {
+		return nil, err
+	}
+
+	return merchants, nil
+}
+
 //@author: [piexlmax](https://github.com/piexlmax)
 //@function: GetUserInfoList
 //@description: 分页获取数据
