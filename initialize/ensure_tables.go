@@ -58,6 +58,9 @@ func (e *ensureTables) MigrateTable(ctx context.Context) (context.Context, error
 		example.ExaFileChunk{},
 		example.ExaFileUploadAndDownload{},
 
+		bizModel.BizQa{},
+		bizModel.BizQaType{},
+		bizModel.BizQuestionType{},
 		bizModel.BizMerchant{},
 		bizModel.BizLinks{},
 		bizModel.BizMerchantLinks{},

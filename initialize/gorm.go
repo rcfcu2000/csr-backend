@@ -55,6 +55,9 @@ func RegisterTables() {
 		example.ExaFileChunk{},
 		example.ExaFileUploadAndDownload{},
 
+		bizModel.BizQa{},
+		bizModel.BizQaType{},
+		bizModel.BizQuestionType{},
 		bizModel.BizMerchant{},
 		bizModel.BizLinks{},
 		bizModel.BizMerchantLinks{},

@@ -57,12 +57,10 @@ func (exa *MerchantService) GetMerchantsByTid(id string) ([]*models.BizMerchant,
 	return merchants, nil
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
-//@function: GetUserInfoList
-//@description: 分页获取数据
-//@param: info request.PageInfo
-//@return: err error, list interface{}, total int64
-
+// @function: GetMerchantList
+// @description: 分页获取数据
+// @param: info request.PageInfo
+// @return: err error, list interface{}, total int64
 func (userService *MerchantService) GetMerchantList(info request.PageInfo) (list interface{}, total int64, err error) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)

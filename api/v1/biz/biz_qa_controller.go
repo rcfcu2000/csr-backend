@@ -2,28 +2,28 @@ package biz
 
 import (
 	"net/http"
+	"strconv"
 	"time"
 
 	"xtt/global"
+	"xtt/utils"
 
 	models "xtt/model/biz"
+	"xtt/model/common/request"
+	"xtt/model/common/response"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
 type BizQaController struct {
-	DB *gorm.DB
 }
 
 type CreateBizQaRequest struct {
 	BizQa            models.BizQa             `json:"biz_qa"`
 	BizQaQuestions   []models.BizQaQuestion   `json:"biz_qa_questions"`
 	BizQuestionTypes []models.BizQuestionType `json:"biz_question_types"`
-}
-
-func NewBizQaController(db *gorm.DB) *BizQaController {
-	return &BizQaController{DB: db}
 }
 
 func (ctrl *BizQaController) CreateBizQa_1(c *gin.Context) {
@@ -121,4 +121,42 @@ func (ctrl *BizQaController) CreateBizQaComplex(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, req.BizQa)
+}
+
+// GetQaList
+// @Tags	  biz_qa
+// @Summary   分页获取知识库列表
+// @Security  ApiKeyAuth
+// @accept    application/json
+// @Produce   application/json
+// @Param     data  body      request.PageInfo           true  "页码, 每页大小"
+// @Success   200   {object}  response.Response{data=response.PageResult,msg=string}  "分页获取知识库列表,返回包括列表,总数,页码,每页数量"
+// @Router    /qa/getQaList [post]
+func (ctrl *BizQaController) GetQaList(c *gin.Context) {
+	var pageInfo request.PageInfo
+	err := c.ShouldBindJSON(&pageInfo)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	err = utils.Verify(pageInfo, utils.PageInfoVerify)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+
+	ktype, _ := strconv.Atoi(pageInfo.Keyword)
+	list, total, err := qaService.GetQaList(pageInfo, ktype)
+	if err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		response.FailWithMessage("获取失败", c)
+		return
+	}
+
+	response.OkWithDetailed(response.PageResult{
+		List:     list,
+		Total:    total,
+		Page:     pageInfo.Page,
+		PageSize: pageInfo.PageSize,
+	}, "获取成功", c)
 }

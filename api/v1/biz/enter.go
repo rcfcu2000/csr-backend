@@ -10,5 +10,7 @@ type ApiGroup struct {
 }
 
 var (
+	qaService       = service.ServiceGroupApp.BizServiceGroup.BizQaService
+	qaTypeService   = service.ServiceGroupApp.BizServiceGroup.BizQaTypeService
 	merchantService = service.ServiceGroupApp.BizServiceGroup.MerchantService
 )

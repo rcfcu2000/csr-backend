@@ -16,6 +16,7 @@ func (e *QaRouter) InitRouter(privateRouter *gin.RouterGroup, publicRouter *gin.
 	{
 		priRouterWithoutRecord.POST("biz_qa_complex", qaController.CreateBizQaComplex)
 		priRouterWithoutRecord.GET("biz_qa/:id", qaController.GetBizQa)
+		priRouterWithoutRecord.POST("getQaList", qaController.GetQaList)
 		priRouterWithoutRecord.PUT("biz_qa/:id", qaController.UpdateBizQa)
 		priRouterWithoutRecord.DELETE("biz_qa/:id", qaController.DeleteBizQa)
 

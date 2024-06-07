@@ -27,6 +27,9 @@ func (i *initBizModel) MigrateTable(ctx context.Context) (context.Context, error
 		return ctx, system.ErrMissingDBContext
 	}
 	return ctx, db.AutoMigrate(
+		&bizModel.BizQa{},
+		&bizModel.BizQaType{},
+		&bizModel.BizQuestionType{},
 		&bizModel.BizMerchant{},
 		&bizModel.BizLinks{},
 		&bizModel.BizMerchantLinks{},
