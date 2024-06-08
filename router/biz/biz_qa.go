@@ -15,10 +15,11 @@ func (e *QaRouter) InitRouter(privateRouter *gin.RouterGroup, publicRouter *gin.
 	qaController := v1.ApiGroupApp.BizApiGroup.BizQaController
 	{
 		priRouterWithoutRecord.POST("biz_qa_complex", qaController.CreateBizQaComplex)
-		priRouterWithoutRecord.GET("biz_qa/:id", qaController.GetBizQa)
+		priRouterWithoutRecord.GET("get/:id", qaController.GetBizQa)
+		priRouterWithoutRecord.GET("question/:q", qaController.GetBizQaByQuestion)
 		priRouterWithoutRecord.POST("getQaList", qaController.GetQaList)
-		priRouterWithoutRecord.PUT("biz_qa/:id", qaController.UpdateBizQa)
-		priRouterWithoutRecord.DELETE("biz_qa/:id", qaController.DeleteBizQa)
+		priRouterWithoutRecord.PUT("update/:id", qaController.UpdateBizQa)
+		priRouterWithoutRecord.DELETE("delete/:id", qaController.DeleteBizQa)
 
 	}
 

@@ -440,6 +440,31 @@ func (b *BaseApi) GetUserInfo(c *gin.Context) {
 	response.OkWithDetailed(gin.H{"userInfo": ReqUser}, "获取成功", c)
 }
 
+// GetUserInfoByName
+// @Tags      SysUser
+// @Summary   获取用户信息
+// @Security  ApiKeyAuth
+// @accept    application/json
+// @Produce   application/json
+// @Param     data  body      request.GetByName        true  "用户名"
+// @Success   200  {object}  response.Response{data=map[string]interface{},msg=string}  "获取用户信息"
+// @Router    /base/userinfo [post]
+func (b *BaseApi) GetUserInfoByName(c *gin.Context) {
+	var reqName request.GetByName
+	err := c.ShouldBindJSON(&reqName)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+	ReqUser, err := userService.GetUserInfoByName(reqName.Name)
+	if err != nil {
+		global.GVA_LOG.Error("获取失败!", zap.Error(err))
+		response.FailWithMessage("获取失败", c)
+		return
+	}
+	response.OkWithDetailed(gin.H{"userInfo": ReqUser}, "获取成功", c)
+}
+
 // ResetPassword
 // @Tags      SysUser
 // @Summary   重置用户密码

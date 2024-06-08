@@ -1,10 +1,10 @@
 package models
 
-import "time"
-
 type BizQuestionType struct {
-	Qid        uint      `gorm:"primaryKey;autoIncrement:false"`
-	TypeID     uint      `gorm:"primaryKey;autoIncrement:false"`
-	UpdateTime time.Time `gorm:"default:NULL"`
-	UpdatedBy  string    `gorm:"size:255"`
+	Qid    uint `gorm:"column:biz_qa_id"`
+	TypeID uint `gorm:"column:biz_qa_type_id"`
+}
+
+func (BizQuestionType) TableName() string {
+	return "biz_question_types"
 }

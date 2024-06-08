@@ -14,7 +14,6 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
-	"gorm.io/gorm"
 )
 
 type BizQaController struct {
@@ -37,6 +36,15 @@ func (ctrl *BizQaController) CreateBizQa_1(c *gin.Context) {
 	c.JSON(http.StatusOK, newQa)
 }
 
+// GetMerchant handles fetching a merchant by ID
+// @Summary Get a merchant by ID
+// @Description Get a merchant by ID
+// @Tags biz_qa
+// @Produce  json
+// @Param id path string true "Qa ID"
+// @Success 200 {object} models.BizQa
+// @Failure 404 {object} models.ErrorResponse
+// @Router /qa/get/{id} [get]
 func (ctrl *BizQaController) GetBizQa(c *gin.Context) {
 	id := c.Param("id")
 	var qa models.BizQa
@@ -47,6 +55,38 @@ func (ctrl *BizQaController) GetBizQa(c *gin.Context) {
 	c.JSON(http.StatusOK, qa)
 }
 
+// GetMerchant handles fetching qa by question
+// @Summary Get qa by question
+// @Description Get qa by question
+// @Tags biz_qa
+// @Produce  json
+// @Param id path string true "Question"
+// @Success 200 {object} models.BizQa
+// @Failure 404 {object} models.ErrorResponse
+// @Router /qa/question/{question} [get]
+func (ctrl *BizQaController) GetBizQaByQuestion(c *gin.Context) {
+	question := c.Param("q")
+
+	qa, err := qaService.GetBizQaByQuestion(question)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Record not found"})
+		return
+	}
+	c.JSON(http.StatusOK, qa)
+}
+
+// UpdateBizQa handles updating an existing qa
+// @Summary Update an existing qa
+// @Description Update an existing qa
+// @Tags biz_qa
+// @Accept  json
+// @Produce  json
+// @Param id path string true "qa ID"
+// @Param merchant body models.BizQa true "Qa"
+// @Success 200 {object} models.BizQa
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /qa/update/{id} [put]
 func (ctrl *BizQaController) UpdateBizQa(c *gin.Context) {
 	id := c.Param("id")
 	var qa models.BizQa
@@ -54,19 +94,33 @@ func (ctrl *BizQaController) UpdateBizQa(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Record not found"})
 		return
 	}
+
 	if err := c.ShouldBindJSON(&qa); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	qa.UpdateTime = time.Now()
-	global.GVA_DB.Save(&qa)
+	if err := qaService.UpdateBizQa(&qa); err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Record update error"})
+		return
+	}
 	c.JSON(http.StatusOK, qa)
 }
 
+// DeleteBizQa handles deleting a qa by ID
+// @Summary Delete a qa by ID
+// @Description Delete a qa by ID
+// @Tags biz_qa
+// @Produce  json
+// @Param id path string true "Qa ID"
+// @Success 200 {string} string "Qa deleted successfully"
+// @Failure 500 {object} models.ErrorResponse
+// @Router /qa/delete/{id} [delete]
 func (ctrl *BizQaController) DeleteBizQa(c *gin.Context) {
 	id := c.Param("id")
-	if err := global.GVA_DB.Delete(&models.BizQa{}, id).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Record not found"})
+
+	qid, _ := strconv.Atoi(id)
+	if err := qaService.DeleteBizQa(uint(qid)); err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Record not found in qa question table"})
 		return
 	}
 	c.JSON(http.StatusOK, gin.H{"message": "Record deleted"})
@@ -90,34 +144,31 @@ func (ctrl *BizQaController) CreateBizQaComplex(c *gin.Context) {
 		return
 	}
 
-	err := global.GVA_DB.Transaction(func(tx *gorm.DB) error {
-		req.BizQa.UpdateTime = time.Now()
-		if err := tx.Create(&req.BizQa).Error; err != nil {
-			return err
-		}
+	// err := global.GVA_DB.Transaction(func(tx *gorm.DB) error {
+	// 	req.BizQa.UpdateTime = time.Now()
+	// 	if err := tx.Create(&req.BizQa).Error; err != nil {
+	// 		return err
+	// 	}
 
-		for _, question := range req.BizQaQuestions {
-			question.Qid = req.BizQa.ID
-			question.UpdateTime = time.Now()
-			if err := tx.Create(&question).Error; err != nil {
-				return err
-			}
-		}
+	// 	for _, qatype := range req.BizQa.QaTypes {
+	// 		qaTypeService.IncrementRefCount(qatype.ID)
+	// 	}
 
-		for _, questionType := range req.BizQuestionTypes {
-			questionType.Qid = req.BizQa.ID
-			questionType.UpdateTime = time.Now()
-			if err := tx.Create(&questionType).Error; err != nil {
-				return err
-			}
-		}
+	// 	return nil
+	// })
 
-		return nil
-	})
-
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, models.ErrorResponse{Error: "Failed to create records"})
+	req.BizQa.UpdateTime = time.Now()
+	if err := global.GVA_DB.Create(&req.BizQa).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
+	}
+
+	for _, qatype := range req.BizQa.QaTypes {
+		err := qaTypeService.IncrementRefCount(qatype.ID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, models.ErrorResponse{Error: "Failed to create records"})
+			return
+		}
 	}
 
 	c.JSON(http.StatusOK, req.BizQa)

@@ -46,3 +46,7 @@ func (s *BizQaTypeService) GetQaTypeList(info request.PageInfo, kb_type int) (li
 func (s *BizQaTypeService) IncrementRefCount(id uint) error {
 	return global.GVA_DB.Model(&models.BizQaType{}).Where("id = ?", id).Update("ref_count", gorm.Expr("ref_count + ?", 1)).Error
 }
+
+func (s *BizQaTypeService) DecreaseRefCountByQaId(id uint) error {
+	return global.GVA_DB.Model(&models.BizQaType{}).Where("id = (select biz_qa_type_id from biz_question_types where biz_qa_id = ?)", id).Update("ref_count", gorm.Expr("ref_count - ?", 1)).Error
+}

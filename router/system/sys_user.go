@@ -25,7 +25,8 @@ func (s *UserRouter) InitUserRouter(Router *gin.RouterGroup) {
 		userRouter.POST("ssoLogin", baseApi.UserSso)                      // 管理员SSO登录账号
 	}
 	{
-		userRouterWithoutRecord.POST("getUserList", baseApi.GetUserList) // 分页获取用户列表
-		userRouterWithoutRecord.GET("getUserInfo", baseApi.GetUserInfo)  // 获取自身信息
+		userRouterWithoutRecord.POST("getUserList", baseApi.GetUserList)             // 分页获取用户列表
+		userRouterWithoutRecord.GET("getUserInfo", baseApi.GetUserInfo)              // 获取自身信息
+		userRouterWithoutRecord.POST("getUserInfoByName", baseApi.GetUserInfoByName) // 获取自身信息
 	}
 }

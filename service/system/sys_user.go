@@ -208,6 +208,16 @@ func (userService *UserService) GetUserInfo(uuid uuid.UUID) (user system.SysUser
 	return reqUser, err
 }
 
+func (userService *UserService) GetUserInfoByName(name string) (user system.SysUser, err error) {
+	var reqUser system.SysUser
+	err = global.GVA_DB.Preload("Authorities").Preload("Authority").First(&reqUser, "nick_name = ?", name).Error
+	if err != nil {
+		return reqUser, err
+	}
+	MenuServiceApp.UserAuthorityDefaultRouter(&reqUser)
+	return reqUser, err
+}
+
 //@author: [SliverHorn](https://github.com/SliverHorn)
 //@function: FindUserById
 //@description: 通过id获取用户信息
