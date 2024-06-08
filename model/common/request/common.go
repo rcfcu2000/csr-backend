@@ -12,6 +12,11 @@ type GetById struct {
 	ID int `json:"id" form:"id"` // 主键ID
 }
 
+// GetByName Find by name structure
+type GetByName struct {
+	Name string `json:"name" form:"name"` // 主键ID
+}
+
 func (r *GetById) Uint() uint {
 	return uint(r.ID)
 }
