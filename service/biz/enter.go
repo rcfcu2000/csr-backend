@@ -4,4 +4,5 @@ type ServiceGroup struct {
 	BizQaService
 	BizQaTypeService
 	MerchantService
+	BizShopService
 }

@@ -391,9 +391,9 @@ func (b *BaseApi) SetUserInfo(c *gin.Context) {
 // @Security  ApiKeyAuth
 // @accept    application/json
 // @Produce   application/json
-// @Param     data  body      system.SysUser                                             true  "ID, 用户名, 昵称, 头像链接"
+// @Param     data  body      systemReq.ChangeUserInfo                  true  "ID, 用户名, 昵称, 头像链接"
 // @Success   200   {object}  response.Response{data=map[string]interface{},msg=string}  "设置用户信息"
-// @Router    /user/SetSelfInfo [put]
+// @Router    /base/setSelfInfo [put]
 func (b *BaseApi) SetSelfInfo(c *gin.Context) {
 	var user systemReq.ChangeUserInfo
 	err := c.ShouldBindJSON(&user)
@@ -402,16 +402,22 @@ func (b *BaseApi) SetSelfInfo(c *gin.Context) {
 		return
 	}
 	user.ID = utils.GetUserID(c)
+	if user.ID <= 0 {
+		response.FailWithMessage("设置失败", c)
+		return
+	}
+
 	err = userService.SetSelfInfo(system.SysUser{
 		GVA_MODEL: global.GVA_MODEL{
 			ID: user.ID,
 		},
-		NickName:  user.NickName,
-		HeaderImg: user.HeaderImg,
-		Phone:     user.Phone,
-		Email:     user.Email,
-		SideMode:  user.SideMode,
-		Enable:    user.Enable,
+		NickName:     user.NickName,
+		HeaderImg:    user.HeaderImg,
+		Phone:        user.Phone,
+		Email:        user.Email,
+		SideMode:     user.SideMode,
+		Enable:       user.Enable,
+		SalesRepType: user.SalesRepType,
 	})
 	if err != nil {
 		global.GVA_LOG.Error("设置失败!", zap.Error(err))
@@ -497,7 +503,7 @@ func (b *BaseApi) ResetPassword(c *gin.Context) {
 // @Produce  application/json
 // @Param     data  body      systemReq.SSOLogin    true  "用户名, 密码, SSo_User"
 // @Success   200   {object}  response.Response{msg=string}  "SSO_登录注册"
-// @Router    /user/ssoLogin [post]
+// @Router    /base/ssoLogin [post]
 func (b *BaseApi) UserSso(c *gin.Context) {
 	var l systemReq.SSOLogin
 	err := c.ShouldBindJSON(&l)
