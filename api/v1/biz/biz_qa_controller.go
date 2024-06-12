@@ -55,6 +55,10 @@ func (ctrl *BizQaController) GetBizQa(c *gin.Context) {
 	c.JSON(http.StatusOK, qa)
 }
 
+type qaQuestions struct {
+	questions []string
+}
+
 // GetBizQaByQuestion handles fetching qa by question
 // @Summary Get qa by question
 // @Description Get qa by question
