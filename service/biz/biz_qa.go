@@ -90,7 +90,8 @@ func (s *BizQaService) DeleteBizQa(id uint) error {
 func (s *BizQaService) GetQaList(info request.PageInfo, kb_type int) (list interface{}, total int64, err error) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
-	db := global.GVA_DB.Model(&models.BizQa{}).Where("kb_type = ?", kb_type)
+	shopId := info.ShopId
+	db := global.GVA_DB.Model(&models.BizQa{}).Where("kb_type = ? and shop_id = ?", kb_type, shopId)
 	var qaList []models.BizQa
 	err = db.Count(&total).Error
 	if err != nil {

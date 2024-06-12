@@ -64,7 +64,8 @@ func (exa *MerchantService) GetMerchantsByTid(id string) ([]*models.BizMerchant,
 func (userService *MerchantService) GetMerchantList(info request.PageInfo) (list interface{}, total int64, err error) {
 	limit := info.PageSize
 	offset := info.PageSize * (info.Page - 1)
-	db := global.GVA_DB.Model(&models.BizMerchant{})
+	shopId := info.ShopId
+	db := global.GVA_DB.Model(&models.BizMerchant{}).Where("shop_id = ?", shopId)
 	var merchantList []models.BizMerchant
 	err = db.Count(&total).Error
 	if err != nil {

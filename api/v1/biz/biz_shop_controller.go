@@ -35,18 +35,19 @@ func (ctrl *ShopController) CreateShop(c *gin.Context) {
 		return
 	}
 
-	err := shopService.GetOrCreateCategory(req.Category)
+	err := shopService.GetOrCreateCategory(&req.Category)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
+
+	req.BrandInfo = fillBrandInfo(&req)
 
 	if err := shopService.CreateShop(&req); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	req.BrandInfo = fillBrandInfo(&req)
 	c.JSON(http.StatusOK, req)
 
 	//go calculateBrandInfo(&req)
@@ -119,7 +120,8 @@ func (ctrl *ShopController) UpdateShop(c *gin.Context) {
 		return
 	}
 
-	shop.BrandInfo = calculateBrandInfo(&req)
+	shop.BrandInfo = fillBrandInfo(shop)
+	//shop.BrandInfo = calculateBrandInfo(&req)
 	//shop.UpdateTime = time.Now()
 
 	if err := shopService.UpdateShop(&req); err != nil {
@@ -248,7 +250,7 @@ func calculateBrandInfo(shop *models.BizShop) string {
 // UploadCategory handles the Excel file upload and data extraction
 // @Summary Upload an Excel file
 // @Description Upload an Excel file and extract data into the category table
-// @Tags Merchants
+// @Tags Shop
 // @Accept multipart/form-data
 // @Produce json
 // @Param file formData file true "Excel file"
@@ -284,21 +286,42 @@ func (ctrl *ShopController) UploadCategory(c *gin.Context) {
 		return
 	}
 
-	for _, row := range rows[1:] { // Skip header row
-		if len(row) < 3 {
+	var parentid uint
+	for _, row := range rows[2:] { // Skip header row
+		if len(row) < 2 {
 			continue // Skip rows that don't have enough columns
 		}
 
-		category := models.BizCategory{
-			Name:       row[0],
-			PresetText: row[2],
-			Level:      1,
+		if len(row[0]) > 0 {
+
+			category := models.BizCategory{
+				Name:       row[0],
+				PresetText: row[2],
+				Level:      1,
+				Status:     1,
+			}
+
+			if err := shopService.GetOrCreateCategory(&category); err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+				return
+			}
+			parentid = category.ID
 		}
-		if err := shopService.GetOrCreateCategory(category); err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
-			return
+
+		// second level
+		if len(row[1]) > 0 {
+			category := models.BizCategory{
+				Name:     row[1],
+				ParentID: parentid,
+				Level:    2,
+				Status:   1,
+			}
+			if err := shopService.GetOrCreateCategory(&category); err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"message": err.Error()})
+				return
+			}
 		}
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Merchants uploaded successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "Categories uploaded successfully"})
 }

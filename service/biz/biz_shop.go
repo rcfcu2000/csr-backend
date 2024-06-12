@@ -44,9 +44,9 @@ func (s *BizShopService) ListShops() ([]models.BizShop, error) {
 	return shops, nil
 }
 
-func (s *BizShopService) GetOrCreateCategory(category models.BizCategory) error {
+func (s *BizShopService) GetOrCreateCategory(category *models.BizCategory) error {
 	if category.ID <= 0 {
-		if err := global.GVA_DB.Create(&category).Error; err != nil {
+		if err := global.GVA_DB.Create(category).Error; err != nil {
 			return err
 		}
 	}

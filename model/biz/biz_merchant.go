@@ -13,6 +13,7 @@ type BizMerchant struct {
 	UpdatedAt     time.Time  // 更新时间
 	UpdatedBy     string     `json:"updatedBy" gorm:"size:255;comment:修改人"`
 	MerchantLinks []BizLinks `json:"merchantLinks" gorm:"many2many:biz_merchant_links"`
+	ShopId        int        `json:"shopId" gorm:"NOT NULL;int"`
 }
 
 func (BizMerchant) TableName() string {
