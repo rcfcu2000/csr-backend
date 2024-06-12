@@ -5,7 +5,7 @@ type PageInfo struct {
 	Page     int    `json:"page" form:"page"`         // 页码
 	PageSize int    `json:"pageSize" form:"pageSize"` // 每页大小
 	Keyword  string `json:"keyword" form:"keyword"`   //关键字
-	ShopId   string `json:"shopId" form:"shopId"`     //店铺ID
+	ShopId   int    `json:"shopId" form:"shopId"`     //店铺ID
 }
 
 // GetById Find by id structure
