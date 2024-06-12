@@ -24,9 +24,9 @@ func (s *BizQaService) GetBizQaByID(id uint) (*models.BizQa, error) {
 	return &bizQa, nil
 }
 
-func (s *BizQaService) GetBizQaByQuestion(question string) (*models.BizQa, error) {
+func (s *BizQaService) GetBizQaByQuestion(question string, shopid int) (*models.BizQa, error) {
 	var bizQa models.BizQa
-	if err := global.GVA_DB.Preload("QaTypes").Where("question = ?", question).First(&bizQa).Error; err != nil {
+	if err := global.GVA_DB.Preload("QaTypes").Where("question = ? and shop_id = ?", question, shopid).First(&bizQa).Error; err != nil {
 		return nil, err
 	}
 	return &bizQa, nil

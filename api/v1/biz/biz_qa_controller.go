@@ -36,7 +36,7 @@ func (ctrl *BizQaController) CreateBizQa_1(c *gin.Context) {
 	c.JSON(http.StatusOK, newQa)
 }
 
-// GetMerchant handles fetching a merchant by ID
+// GetBizQa handles fetching a qa by ID
 // @Summary Get a merchant by ID
 // @Description Get a merchant by ID
 // @Tags biz_qa
@@ -55,19 +55,22 @@ func (ctrl *BizQaController) GetBizQa(c *gin.Context) {
 	c.JSON(http.StatusOK, qa)
 }
 
-// GetMerchant handles fetching qa by question
+// GetBizQaByQuestion handles fetching qa by question
 // @Summary Get qa by question
 // @Description Get qa by question
 // @Tags biz_qa
 // @Produce  json
-// @Param id path string true "Question"
+// @Param question path string true "Question"
+// @Param shopid path int true "Shopid"
 // @Success 200 {object} models.BizQa
 // @Failure 404 {object} models.ErrorResponse
-// @Router /qa/question/{question} [get]
+// @Router /qa/question/{shopid}/{question} [get]
 func (ctrl *BizQaController) GetBizQaByQuestion(c *gin.Context) {
-	question := c.Param("q")
+	question := c.Param("question")
+	id := c.Param("shopid")
 
-	qa, err := qaService.GetBizQaByQuestion(question)
+	sid, _ := strconv.Atoi(id)
+	qa, err := qaService.GetBizQaByQuestion(question, sid)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Record not found"})
 		return
