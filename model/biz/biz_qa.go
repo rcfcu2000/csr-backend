@@ -13,6 +13,10 @@ type BizQa struct {
 	ShopId     int         `json:"shopId" gorm:"NOT NULL;int"`
 }
 
+type BizQaQuestions struct {
+	Questions []string `json:"questions"`
+}
+
 func (BizQa) TableName() string {
 	return "biz_qas"
 }

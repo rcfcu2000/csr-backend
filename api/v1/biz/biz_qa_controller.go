@@ -60,17 +60,22 @@ func (ctrl *BizQaController) GetBizQa(c *gin.Context) {
 // @Description Get qa by question
 // @Tags biz_qa
 // @Produce  json
-// @Param question path string true "Question"
 // @Param shopid path int true "Shopid"
-// @Success 200 {object} models.BizQa
+// @Param questions body models.BizQaQuestions true "Qa"
+// @Success 200 {object} []models.BizQa
 // @Failure 404 {object} models.ErrorResponse
-// @Router /qa/question/{shopid}/{question} [get]
+// @Router /qa/question/{shopid} [post]
 func (ctrl *BizQaController) GetBizQaByQuestion(c *gin.Context) {
-	question := c.Param("question")
 	id := c.Param("shopid")
+	var ques models.BizQaQuestions
+
+	if err := c.ShouldBindJSON(&ques); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
 
 	sid, _ := strconv.Atoi(id)
-	qa, err := qaService.GetBizQaByQuestion(question, sid)
+	qa, err := qaService.GetBizQaByQuestion(ques.Questions, sid)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Record not found"})
 		return

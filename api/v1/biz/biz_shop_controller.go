@@ -114,13 +114,13 @@ func (ctrl *ShopController) UpdateShop(c *gin.Context) {
 
 	cid, _ := strconv.Atoi(id)
 
-	shop, err := shopService.GetShopByID(uint(cid))
+	_, err := shopService.GetShopByID(uint(cid))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	shop.BrandInfo = fillBrandInfo(shop)
+	req.BrandInfo = fillBrandInfo(&req)
 	//shop.BrandInfo = calculateBrandInfo(&req)
 	//shop.UpdateTime = time.Now()
 
@@ -196,9 +196,9 @@ type RequestPayload struct {
 }
 
 func fillBrandInfo(shop *models.BizShop) string {
-	brandInfo := "我们的店铺昵称是" + shop.Nickname
-	brandInfo += "我们的经营项目是" + shop.BrandManagement
-	brandInfo += "我们的品牌理念是" + shop.BrandBelief
+	brandInfo := "我们的店铺昵称是" + shop.Nickname + "。"
+	brandInfo += "我们的经营项目是" + shop.BrandManagement + "。"
+	brandInfo += "我们的品牌理念是" + shop.BrandBelief + "。"
 	brandInfo += "我们的核心卖点是" + shop.BrandAdvantage
 
 	return brandInfo

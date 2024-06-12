@@ -24,12 +24,12 @@ func (s *BizQaService) GetBizQaByID(id uint) (*models.BizQa, error) {
 	return &bizQa, nil
 }
 
-func (s *BizQaService) GetBizQaByQuestion(question string, shopid int) (*models.BizQa, error) {
-	var bizQa models.BizQa
-	if err := global.GVA_DB.Preload("QaTypes").Where("question = ? and shop_id = ?", question, shopid).First(&bizQa).Error; err != nil {
+func (s *BizQaService) GetBizQaByQuestion(questions []string, shopid int) ([]models.BizQa, error) {
+	var bizQa []models.BizQa
+	if err := global.GVA_DB.Preload("QaTypes").Where("question in (?) and shop_id = ?", questions, shopid).Find(&bizQa).Error; err != nil {
 		return nil, err
 	}
-	return &bizQa, nil
+	return bizQa, nil
 }
 
 func (s *BizQaService) UpdateBizQa(bizQa *models.BizQa) error {
