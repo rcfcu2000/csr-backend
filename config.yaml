@@ -71,7 +71,7 @@ mysql:
   singular: false
   engine: ""
   max-idle-conns: 10
-  max-open-conns: 100
+  max-open-conns: 30
   log-mode: error
   log-zap: false
 

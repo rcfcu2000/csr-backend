@@ -126,6 +126,7 @@ func (b *BaseApi) TokenNext(c *gin.Context, user system.SysUser) {
 			response.FailWithMessage("设置登录状态失败", c)
 			return
 		}
+
 		response.OkWithDetailed(systemRes.LoginResponse{
 			User:      user,
 			Token:     token,

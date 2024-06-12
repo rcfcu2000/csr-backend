@@ -37,4 +37,5 @@ var (
 	dictionaryDetailService = service.ServiceGroupApp.SystemServiceGroup.DictionaryDetailService
 	authorityBtnService     = service.ServiceGroupApp.SystemServiceGroup.AuthorityBtnService
 	chatGptService          = service.ServiceGroupApp.SystemServiceGroup.ChatGptService
+	bizShopService          = service.ServiceGroupApp.BizServiceGroup.BizShopService
 )

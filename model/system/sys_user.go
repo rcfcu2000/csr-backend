@@ -23,6 +23,7 @@ type SysUser struct {
 	Email        string         `json:"email"  gorm:"comment:用户邮箱"`                      // 用户邮箱
 	Enable       int            `json:"enable" gorm:"default:1;comment:用户是否被冻结 1正常 2冻结"` //用户是否被冻结 1正常 2冻结
 	SalesRepType int            `json:"salesRepType" gorm:"default:1;comment:用户组"`       //用户组 1售前 2售后
+	ShopId       uint           `json:"shopId" gorm:"comment:shop ID"`                   // shop ID
 }
 
 func (SysUser) TableName() string {

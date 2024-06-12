@@ -5,4 +5,5 @@ type RouterGroup struct {
 	QaTypeRouter
 	MessageRouter
 	MerchantRouter
+	ShopRouter
 }

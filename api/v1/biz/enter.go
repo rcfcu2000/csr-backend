@@ -7,6 +7,7 @@ type ApiGroup struct {
 	BizQaController
 	BizQaTypeController
 	BizMerchantController
+	ShopController
 }
 
 var (

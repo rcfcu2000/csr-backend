@@ -1,7 +1,6 @@
 package biz
 
 import (
-	"fmt"
 	"xtt/global"
 	"xtt/model/biz"
 )
@@ -10,7 +9,6 @@ type BizShopService struct {
 }
 
 func (s *BizShopService) CreateShop(shop *models.BizShop) error {
-	shop.BrandInfo = s.calculateBrandInfo(shop)
 	return global.GVA_DB.Create(shop).Error
 }
 
@@ -22,8 +20,15 @@ func (s *BizShopService) GetShopByID(id uint) (*models.BizShop, error) {
 	return &shop, nil
 }
 
+func (s *BizShopService) GetShopByName(name string) (*models.BizShop, error) {
+	var shop models.BizShop
+	if err := global.GVA_DB.Preload("Category").Where("name = ?", name).First(&shop).Error; err != nil {
+		return nil, err
+	}
+	return &shop, nil
+}
+
 func (s *BizShopService) UpdateShop(shop *models.BizShop) error {
-	shop.BrandInfo = s.calculateBrandInfo(shop)
 	return global.GVA_DB.Save(shop).Error
 }
 
@@ -39,6 +44,19 @@ func (s *BizShopService) ListShops() ([]models.BizShop, error) {
 	return shops, nil
 }
 
-func (s *BizShopService) calculateBrandInfo(shop *models.BizShop) string {
-	return fmt.Sprintf("品牌理念: %s; 品牌优势: %s", shop.BrandAdvantage, shop.BrandBelief)
+func (s *BizShopService) GetOrCreateCategory(category models.BizCategory) error {
+	if category.ID <= 0 {
+		if err := global.GVA_DB.Create(&category).Error; err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (s *BizShopService) ListCategories() ([]models.BizCategory, error) {
+	var categories []models.BizCategory
+	if err := global.GVA_DB.Find(&categories).Error; err != nil {
+		return nil, err
+	}
+	return categories, nil
 }
