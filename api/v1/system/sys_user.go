@@ -537,7 +537,7 @@ func (b *BaseApi) UserSso(c *gin.Context) {
 		return
 	}
 
-	U := &system.SysUser{Username: l.SsoUser, Password: l.SsoUser}
+	U := &system.SysUser{Username: l.SsoUser, Password: l.SsoUser, ShopId: user.ShopId}
 	sso_user, err := userService.Login(U)
 
 	if err != nil {
