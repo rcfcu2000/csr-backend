@@ -541,7 +541,7 @@ func (b *BaseApi) UserSso(c *gin.Context) {
 	sso_user, err := userService.Login(U)
 
 	if err != nil {
-		sso_user = &system.SysUser{Username: l.SsoUser, Password: l.SsoUser, NickName: l.SsoUser}
+		sso_user = &system.SysUser{Username: l.SsoUser, Password: l.SsoUser, NickName: l.SsoUser, ShopId: user.ShopId}
 		userReturn, err := userService.Register(*sso_user)
 		if err != nil {
 			global.GVA_LOG.Error("注册失败!", zap.Error(err))
