@@ -9,7 +9,8 @@ type BizQa struct {
 	UpdateTime time.Time   `gorm:"default:NULL"`
 	RegEx      string      `gorm:"size:555"`
 	UpdatedBy  string      `gorm:"size:255"`
-	KbType     int         `gorm:"NOT NULL;int"` // 1 通用知识库   2 定制知识库
+	Enable     string      `gorm:"default 1;int"`
+	KbType     int         `gorm:"default 1;int"` // 1 通用知识库   2 定制知识库
 	QaTypes    []BizQaType `json:"qa_types" gorm:"many2many:biz_question_types"`
 	ShopId     int         `json:"shopId" gorm:"NOT NULL;int"`
 }
