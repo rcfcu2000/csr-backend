@@ -6,4 +6,5 @@ type RouterGroup struct {
 	MessageRouter
 	MerchantRouter
 	ShopRouter
+	AutoReplyRouter
 }

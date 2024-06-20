@@ -9,6 +9,7 @@ type BizShop struct {
 	BrandManagement string      `json:"brandManagement" gorm:"size:355"`
 	BrandBelief     string      `json:"brandBelief" gorm:"size:355"`
 	BrandAdvantage  string      `json:"brandAdvantage" gorm:"size:355"`
+	RegEx           string      `json:"regEx" gorm:"size:555"`
 	BrandInfo       string      `json:"brandInfo" gorm:"size:555"`
 }
 

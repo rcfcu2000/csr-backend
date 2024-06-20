@@ -82,6 +82,7 @@ func Routers() *gin.Engine {
 		bizRouter.MessageRouter.InitRouter(PrivateGroup, PublicGroup)
 		bizRouter.MerchantRouter.InitRouter(PrivateGroup, PublicGroup)
 		bizRouter.ShopRouter.InitRouter(PrivateGroup, PublicGroup)
+		bizRouter.AutoReplyRouter.InitRouter(PrivateGroup, PublicGroup)
 	}
 
 	global.GVA_LOG.Info("router register success")

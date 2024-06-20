@@ -181,6 +181,9 @@ func (ctrl *BizMerchantController) DeleteMerchant(c *gin.Context) {
 // @Failure 500 {object} models.ErrorResponse
 // @Router /merchant/upload [post]
 func (ctrl *BizMerchantController) UploadExcel(c *gin.Context) {
+	sid := c.Query("shopId")
+	shopId, _ := strconv.Atoi(sid)
+
 	file, err := c.FormFile("file")
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
@@ -229,6 +232,7 @@ func (ctrl *BizMerchantController) UploadExcel(c *gin.Context) {
 			Information:   row[2],
 			UpdatedBy:     "system",
 			MerchantLinks: links,
+			ShopId:        shopId,
 		}
 
 		merchants = append(merchants, merchant)
