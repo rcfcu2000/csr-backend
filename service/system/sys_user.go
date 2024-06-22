@@ -45,13 +45,12 @@ func (userService *UserService) Register(u system.SysUser) (userInter system.Sys
 	return u, err
 }
 
-//@author: [piexlmax](https://github.com/piexlmax)
-//@author: [SliverHorn](https://github.com/SliverHorn)
-//@function: Login
-//@description: 用户登录
-//@param: u *model.SysUser
-//@return: err error, userInter *model.SysUser
-
+// @author: [piexlmax](https://github.com/piexlmax)
+// @author: [SliverHorn](https://github.com/SliverHorn)
+// @function: Login
+// @description: 用户登录
+// @param: u *model.SysUser
+// @return: err error, userInter *model.SysUser
 func (userService *UserService) Login(u *system.SysUser) (userInter *system.SysUser, err error) {
 	if nil == global.GVA_DB {
 		return nil, fmt.Errorf("db not init")
@@ -64,6 +63,27 @@ func (userService *UserService) Login(u *system.SysUser) (userInter *system.SysU
 			return nil, errors.New("密码错误")
 		}
 		MenuServiceApp.UserAuthorityDefaultRouter(&user)
+	}
+	return &user, err
+}
+
+// @author: [piexlmax](https://github.com/piexlmax)
+// @author: [SliverHorn](https://github.com/SliverHorn)
+// @function: ssoLogin
+// @description: 用户登录
+// @param: u *model.SysUser
+// @return: err error, userInter *model.SysUser
+func (userService *UserService) SsoLogin(u *system.SysUser) (userInter *system.SysUser, err error) {
+	if nil == global.GVA_DB {
+		return nil, fmt.Errorf("db not init")
+	}
+
+	var user system.SysUser
+	err = global.GVA_DB.Where("username = ?", u.Username).First(&user).Error
+	if err == nil {
+		if ok := utils.BcryptCheck(u.Password, user.Password); !ok {
+			return nil, errors.New("密码错误")
+		}
 	}
 	return &user, err
 }
@@ -221,11 +241,10 @@ func (userService *UserService) GetUserInfo(uuid uuid.UUID) (user system.SysUser
 
 func (userService *UserService) GetUserInfoByName(name string) (user system.SysUser, err error) {
 	var reqUser system.SysUser
-	err = global.GVA_DB.Preload("Authorities").Preload("Authority").First(&reqUser, "nick_name = ?", name).Error
+	err = global.GVA_DB.First(&reqUser, "nick_name = ?", name).Error
 	if err != nil {
 		return reqUser, err
 	}
-	MenuServiceApp.UserAuthorityDefaultRouter(&reqUser)
 	return reqUser, err
 }
 

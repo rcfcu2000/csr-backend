@@ -518,6 +518,7 @@ func (b *BaseApi) RSASso(c *gin.Context) {
 	decryptedData := utils.GetAuthData(l.AuthKey)
 	parts := strings.Split(decryptedData, "|")
 	if len(parts) != 2 {
+		response.FailWithMessage("验证失败", c)
 		return
 	}
 
@@ -540,7 +541,7 @@ func (b *BaseApi) RSASso(c *gin.Context) {
 	}
 
 	U := &system.SysUser{Username: l.SsoUser, Password: l.SsoUser}
-	sso_user, err := userService.Login(U)
+	sso_user, err := userService.SsoLogin(U)
 
 	if err != nil {
 		sso_user = &system.SysUser{Username: l.SsoUser, Password: l.SsoUser, NickName: l.SsoUser}
@@ -551,7 +552,7 @@ func (b *BaseApi) RSASso(c *gin.Context) {
 			return
 		}
 		// now login again
-		sso_user, _ = userService.Login(sso_user)
+		sso_user, _ = userService.SsoLogin(sso_user)
 	}
 
 	b.TokenNext(c, *sso_user)
