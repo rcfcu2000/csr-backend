@@ -503,9 +503,9 @@ func (b *BaseApi) ResetPassword(c *gin.Context) {
 // @Security  ApiKeyAuth
 // @accept    application/json
 // @Produce  application/json
-// @Param     data  body      systemReq.SSOLogin    true  "用户名, 密码, SSo_User"
+// @Param     data  body      systemReq.AuthLogin    true  "Auth Token, SSo_User"
 // @Success   200   {object}  response.Response{msg=string}  "SSO_登录注册"
-// @Router    /base/ssoLogin [post]
+// @Router    /base/rsaSsoLogin [post]
 func (b *BaseApi) RSASso(c *gin.Context) {
 	var l systemReq.AuthLogin
 	err := c.ShouldBindJSON(&l)
