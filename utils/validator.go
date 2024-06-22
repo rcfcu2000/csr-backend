@@ -1,7 +1,14 @@
 package utils
 
 import (
+	"crypto/rand"
+	"crypto/rsa"
+	"crypto/x509"
+	"encoding/base64"
+	"encoding/pem"
 	"errors"
+	"log"
+	"os"
 	"reflect"
 	"regexp"
 	"strconv"
@@ -106,6 +113,54 @@ func Ge(mark string) string {
 
 func Gt(mark string) string {
 	return "gt=" + mark
+}
+
+func DecryptData(encryptedData string, privateKey *rsa.PrivateKey) (string, error) {
+	data, err := base64.StdEncoding.DecodeString(encryptedData)
+	if err != nil {
+		return "", err
+	}
+
+	decryptedBytes, err := rsa.DecryptPKCS1v15(rand.Reader, privateKey, data)
+	if err != nil {
+		return "", err
+	}
+
+	return string(decryptedBytes), nil
+}
+
+func LoadPublicKey(publicKeyPath string) (*rsa.PrivateKey, error) {
+	publicKeyBytes, err := os.ReadFile(publicKeyPath)
+	if err != nil {
+		return nil, err
+	}
+
+	block, _ := pem.Decode(publicKeyBytes)
+	if block == nil || block.Type != "PRIVATE KEY" {
+		return nil, err
+	}
+
+	pub, err := x509.ParsePKCS8PrivateKey(block.Bytes)
+	if err != nil {
+		return nil, err
+	}
+
+	return pub.(*rsa.PrivateKey), nil
+}
+
+func GetAuthData(encryptedData string) string {
+	publicKeyPath := "private_key.pem"
+
+	publicKey, err := LoadPublicKey(publicKeyPath)
+	if err != nil {
+		log.Fatalf("Failed to load public key: %v", err)
+	}
+
+	decryptedData, err := DecryptData(encryptedData, publicKey)
+	if err != nil {
+		log.Fatalf("Failed to decrypt data: %v", err)
+	}
+	return decryptedData
 }
 
 //

@@ -25,7 +25,13 @@ type Login struct {
 	CaptchaId string `json:"captchaId"` // 验证码ID
 }
 
-// User login structure
+// authKey login structure
+type AuthLogin struct {
+	AuthKey string `json:"authKey"`     // 用户名
+	SsoUser string `json:"ssoUsername"` // SSO用户
+}
+
+// SSO login structure
 type SSOLogin struct {
 	Username string `json:"username"`    // 用户名
 	Password string `json:"password"`    // 密码

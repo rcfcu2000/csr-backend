@@ -2,6 +2,7 @@ package system
 
 import (
 	"strconv"
+	"strings"
 	"time"
 
 	"xtt/global"
@@ -494,6 +495,66 @@ func (b *BaseApi) ResetPassword(c *gin.Context) {
 		return
 	}
 	response.OkWithMessage("重置成功", c)
+}
+
+// RSA SSO
+// @Tags      SysUser
+// @Summary   SSO_登录注册
+// @Security  ApiKeyAuth
+// @accept    application/json
+// @Produce  application/json
+// @Param     data  body      systemReq.SSOLogin    true  "用户名, 密码, SSo_User"
+// @Success   200   {object}  response.Response{msg=string}  "SSO_登录注册"
+// @Router    /base/ssoLogin [post]
+func (b *BaseApi) RSASso(c *gin.Context) {
+	var l systemReq.AuthLogin
+	err := c.ShouldBindJSON(&l)
+
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+
+	decryptedData := utils.GetAuthData(l.AuthKey)
+	parts := strings.Split(decryptedData, "|")
+	if len(parts) != 2 {
+		return
+	}
+
+	guid := parts[0]
+	timestamp, err := strconv.ParseInt(parts[1], 10, 64)
+	if err != nil {
+		response.FailWithMessage("验证失败", c)
+		return
+	}
+
+	if guid != global.GVA_CONFIG.System.Guid {
+		response.FailWithMessage("验证失败", c)
+		return
+	}
+
+	longtime := time.Now().Unix()
+	if timestamp <= (longtime - 30) {
+		response.FailWithMessage("验证失败", c)
+		return
+	}
+
+	U := &system.SysUser{Username: l.SsoUser, Password: l.SsoUser}
+	sso_user, err := userService.Login(U)
+
+	if err != nil {
+		sso_user = &system.SysUser{Username: l.SsoUser, Password: l.SsoUser, NickName: l.SsoUser}
+		userReturn, err := userService.Register(*sso_user)
+		if err != nil {
+			global.GVA_LOG.Error("注册失败!", zap.Error(err))
+			response.FailWithDetailed(systemRes.SysUserResponse{User: userReturn}, "注册失败", c)
+			return
+		}
+		// now login again
+		sso_user, _ = userService.Login(sso_user)
+	}
+
+	b.TokenNext(c, *sso_user)
 }
 
 // User SSO

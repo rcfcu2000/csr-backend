@@ -3,9 +3,11 @@ package system
 import (
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"xtt/global"
+	models "xtt/model/biz"
 	"xtt/model/common/request"
 	"xtt/model/system"
 	"xtt/utils"
@@ -30,6 +32,15 @@ func (userService *UserService) Register(u system.SysUser) (userInter system.Sys
 	// 否则 附加uuid 密码hash加密 注册
 	u.Password = utils.BcryptHash(u.Password)
 	u.UUID = uuid.NewV4()
+
+	shopName := strings.Split(u.Username, ":")[0]
+	var shop models.BizShop
+	if !errors.Is(global.GVA_DB.Model(&models.BizShop{}).Where("name = ?", shopName).First(&shop).Error, gorm.ErrRecordNotFound) { // 判断用户名是否注册
+		return userInter, errors.New("店铺名错误")
+	}
+
+	u.ShopId = shop.ID
+
 	err = global.GVA_DB.Create(&u).Error
 	return u, err
 }

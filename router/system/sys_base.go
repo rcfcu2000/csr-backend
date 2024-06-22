@@ -16,6 +16,7 @@ func (s *BaseRouter) InitBaseRouter(Router *gin.RouterGroup) (R gin.IRoutes) {
 		baseRouter.POST("captcha", baseApi.Captcha)
 		baseRouter.POST("userinfo", baseApi.GetUserInfoByName) // 获取自身信息
 		baseRouter.POST("ssoLogin", baseApi.UserSso)           // SSO 登录
+		baseRouter.POST("rsaSsoLogin", baseApi.RSASso)         // RSA SSO 登录
 		baseRouter.PUT("setSelfInfo", baseApi.SetSelfInfo)     // 设置自身信息
 	}
 	return baseRouter
