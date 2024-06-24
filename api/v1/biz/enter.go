@@ -9,6 +9,7 @@ type ApiGroup struct {
 	BizMerchantController
 	ShopController
 	BizAutoReplyController
+	BizClothSizeController
 }
 
 var (
@@ -17,4 +18,5 @@ var (
 	merchantService = service.ServiceGroupApp.BizServiceGroup.MerchantService
 	shopService     = service.ServiceGroupApp.BizServiceGroup.BizShopService
 	arService       = service.ServiceGroupApp.BizServiceGroup.BizAutoReplyService
+	csService       = service.ServiceGroupApp.BizServiceGroup.BizClothSizeService
 )

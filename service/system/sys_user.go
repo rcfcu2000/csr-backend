@@ -35,7 +35,7 @@ func (userService *UserService) Register(u system.SysUser) (userInter system.Sys
 
 	shopName := strings.Split(u.Username, ":")[0]
 	var shop models.BizShop
-	if !errors.Is(global.GVA_DB.Model(&models.BizShop{}).Where("name = ?", shopName).First(&shop).Error, gorm.ErrRecordNotFound) { // 判断用户名是否注册
+	if errors.Is(global.GVA_DB.Model(&models.BizShop{}).Where("name = ?", shopName).First(&shop).Error, gorm.ErrRecordNotFound) {
 		return userInter, errors.New("店铺名错误")
 	}
 

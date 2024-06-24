@@ -64,6 +64,7 @@ func RegisterTables() {
 		bizModel.BizCategory{},
 		bizModel.BizShop{},
 		bizModel.BizAutoReply{},
+		bizModel.BizClothSize{},
 	)
 	if err != nil {
 		global.GVA_LOG.Error("register table failed", zap.Error(err))

@@ -6,4 +6,5 @@ type ServiceGroup struct {
 	MerchantService
 	BizShopService
 	BizAutoReplyService
+	BizClothSizeService
 }

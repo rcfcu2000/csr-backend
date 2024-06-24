@@ -7,4 +7,5 @@ type RouterGroup struct {
 	MerchantRouter
 	ShopRouter
 	AutoReplyRouter
+	ClothSizeInfoRouter
 }
