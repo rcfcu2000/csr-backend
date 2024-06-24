@@ -6,6 +6,8 @@ import (
 	"xtt/global"
 	models "xtt/model/biz"
 	"xtt/model/common/request"
+
+	"gorm.io/gorm"
 )
 
 type BizClothSizeService struct{}
@@ -38,6 +40,38 @@ func (s *BizClothSizeService) UpdateClothSizeInfo(bizQa *models.BizClothSize) er
 	}
 
 	return nil
+}
+
+func (s *BizClothSizeService) GetMerchantList(id uint) ([]models.BizMerchantSizeInfo, error) {
+	var mlist []models.BizMerchantSizeInfo
+	db := global.GVA_DB.Model(&models.BizMerchantSizeInfo{}).Where("biz_clothsize_sizeinfo_id = ?", id)
+	err := db.Find(&mlist).Error
+	return mlist, err
+}
+
+func (s *BizClothSizeService) UpdateMerchantList(mlist *models.UpdateMList) error {
+	return global.GVA_DB.Transaction(func(tx *gorm.DB) error {
+
+		if err := global.GVA_DB.Model(&models.BizMerchantSizeInfo{}).Where("biz_clothsize_sizeinfo_id = ?", mlist.ClothSizeInfoId).Delete(&models.BizMerchantSizeInfo{}).Error; err != nil {
+			return err
+		}
+
+		for _, merchantid := range mlist.MerchantIds {
+			var ms models.BizMerchantSizeInfo
+			ms.BizSizeInfoId = uint(mlist.ClothSizeInfoId)
+			ms.BizMerchantId = uint(merchantid)
+			if err := tx.Create(&ms).Error; err != nil {
+				return err
+			}
+		}
+
+		refCount := len(mlist.MerchantIds)
+		if err := global.GVA_DB.Model(&models.BizClothSize{}).Where("id = ?", mlist.ClothSizeInfoId).Update("ref_count", refCount).Error; err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
 func (s *BizClothSizeService) DeleteClothSizeInfo(id uint) error {

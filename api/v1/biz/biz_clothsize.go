@@ -77,7 +77,7 @@ func (ctrl *BizClothSizeController) GetBizQaByQuestion(c *gin.Context) {
 	c.JSON(http.StatusOK, qa)
 }
 
-// UpdateBizQa handles updating an existing cloth size
+// UpdateClothSize handles updating an existing cloth size
 // @Summary Update an existing cloth size by ID
 // @Description Update an existing cloth size by ID
 // @Tags biz_clothsize
@@ -106,6 +106,61 @@ func (ctrl *BizClothSizeController) UpdateClothSize(c *gin.Context) {
 		return
 	}
 	c.JSON(http.StatusOK, qa)
+}
+
+// UpdateMerchantList handles updating merchant list for size info
+// @Summary Update an existing cloth size
+// @Description Update an existing cloth size
+// @Tags biz_clothsize
+// @Accept  json
+// @Produce  json
+// @Param merchant body models.UpdateMList true "cloth size"
+// @Success 200 {object} models.UpdateMList
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /clothsize/updateMerchantList [put]
+func (ctrl *BizClothSizeController) UpdateMerchantList(c *gin.Context) {
+	var mlist models.UpdateMList
+	err := c.ShouldBindJSON(&mlist)
+	if err != nil {
+		response.FailWithMessage(err.Error(), c)
+		return
+	}
+
+	var cs models.BizClothSize
+	if err := global.GVA_DB.First(&cs, mlist.ClothSizeInfoId).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "cloth size Record not found"})
+		return
+	}
+
+	if err := csService.UpdateMerchantList(&mlist); err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Record update error"})
+		return
+	}
+	c.JSON(http.StatusOK, mlist)
+}
+
+// GetMerchantList handles get merchant list for size info
+// @Summary get merchant lsit of an existing cloth size
+// @Description get an existing cloth size
+// @Tags biz_clothsize
+// @Accept  json
+// @Produce  json
+// @Param id path string true "cloth size ID"
+// @Success 200 {object} models.UpdateMList
+// @Failure 400 {object} models.ErrorResponse
+// @Failure 500 {object} models.ErrorResponse
+// @Router /clothsize/getMerchantList/{id} [get]
+func (ctrl *BizClothSizeController) GetMerchantList(c *gin.Context) {
+	id := c.Param("id")
+	qid, _ := strconv.Atoi(id)
+
+	mlist, err := csService.GetMerchantList(uint(qid))
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Record read error"})
+		return
+	}
+	c.JSON(http.StatusOK, mlist)
 }
 
 // DeleteBizQa handles deleting a cloth size by ID
