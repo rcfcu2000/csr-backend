@@ -16,6 +16,7 @@ func (e *ClothSizeInfoRouter) InitRouter(privateRouter *gin.RouterGroup, publicR
 	{
 		priRouterWithoutRecord.POST("create", csController.CreateClothSize)
 		priRouterWithoutRecord.GET("get/:id", csController.GetClothSize)
+		priRouterWithoutRecord.GET("merchant", csController.GetClothSizeByMerchant)
 		priRouterWithoutRecord.POST("getList", csController.GetClothSizeList)
 		priRouterWithoutRecord.PUT("update/:id", csController.UpdateClothSize)
 		priRouterWithoutRecord.PUT("updateMerchantList", csController.UpdateMerchantList)

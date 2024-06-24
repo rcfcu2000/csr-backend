@@ -49,32 +49,28 @@ func (ctrl *BizClothSizeController) GetClothSize(c *gin.Context) {
 	c.JSON(http.StatusOK, qa)
 }
 
-// GetBizQaByQuestion handles fetching qa by question
-// @Summary Get qa by question
-// @Description Get qa by question
+// GetClothSizeByMerchant handles fetching cloth size by merchant
+// @Summary Get cloth size by merchant
+// @Description Get cloth size by merchant
 // @Tags biz_clothsize
 // @Produce  json
-// @Param shopid path int true "Shopid"
-// @Param questions body models.BizQaQuestions true "Qa"
+// @Param merchantid query int true "merchantid"
+// @Param shopid query int true "shopid"
 // @Success 200 {object} []models.BizClothSize
 // @Failure 404 {object} models.ErrorResponse
-// @Router /clothsize/question/{shopid} [post]
-func (ctrl *BizClothSizeController) GetBizQaByQuestion(c *gin.Context) {
-	id := c.Param("shopid")
-	var ques models.BizQaQuestions
+// @Router /clothsize/merchant [get]
+func (ctrl *BizClothSizeController) GetClothSizeByMerchant(c *gin.Context) {
+	mid := c.Query("merchantid")
+	sid := c.Query("shopid")
 
-	if err := c.ShouldBindJSON(&ques); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		return
-	}
-
-	sid, _ := strconv.Atoi(id)
-	qa, err := qaService.GetBizQaByQuestion(ques.Questions, sid)
+	merchantid, _ := strconv.Atoi(mid)
+	shopid, _ := strconv.Atoi(sid)
+	cs, err := csService.GetClothSizeInfoByMerchat(merchantid, shopid)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Record not found"})
 		return
 	}
-	c.JSON(http.StatusOK, qa)
+	c.JSON(http.StatusOK, cs)
 }
 
 // UpdateClothSize handles updating an existing cloth size

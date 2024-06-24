@@ -24,12 +24,22 @@ func (s *BizClothSizeService) GetClothSizeInfoByID(id uint) (*models.BizClothSiz
 	return &bizQa, nil
 }
 
-func (s *BizClothSizeService) GetClothSizeInfoByQuestion(questions []string, shopid int) ([]models.BizQa, error) {
-	var bizQa []models.BizQa
-	if err := global.GVA_DB.Preload("QaTypes").Where("question in (?) and shop_id = ?", questions, shopid).Find(&bizQa).Error; err != nil {
-		return nil, err
+func (s *BizClothSizeService) GetClothSizeInfoByMerchat(merchant_id int, shopid int) (*models.BizClothSize, error) {
+	var bizQa models.BizClothSize
+
+	if merchant_id <= 0 {
+
+		if err := global.GVA_DB.Where("status = 2 and shop_id = ?", shopid).Find(&bizQa).Error; err != nil {
+			return nil, err
+		}
+		return &bizQa, nil
+	} else {
+
+		if err := global.GVA_DB.Model(&models.BizClothSize{}).Where("id = (select biz_clothsize_sizeinfo_id from biz_merchant_sizeinfo where  biz_merchant_merchant_id = ?) and shop_id = ?", merchant_id, shopid).First(&bizQa).Error; err != nil {
+			return nil, err
+		}
+		return &bizQa, nil
 	}
-	return bizQa, nil
 }
 
 func (s *BizClothSizeService) UpdateClothSizeInfo(bizQa *models.BizClothSize) error {
